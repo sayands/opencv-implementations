@@ -1,27 +1,40 @@
 # import the necessary packages
 import numpy as np 
 import cv2
+import argparse
+
+def show_image(title, image, width = 300):
+    # resize the image to have a constant width, just to
+    # make displaying the images take up less screen real
+    # estate
+
+    r = width / float(image.shape[1])
+    dim = (width, int(image.shape[0] * r))
+    resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+
+    # show the resized image
+    cv2.imshow(title, resized)
 
 def color_transfer(source, target):
     # convert the images from RGB to L*ab* color space, being
     # sure to utilizing the floating point datatype (note : OpenCV
     # expects float to be 32-bit, so use that instead of 64-bit)
 
-    source = cv2.cvtColor(source, cv2.COLOR_BGR2LAB)
-    target = cv2.cvtColor(target, cv2.COLOR_BGR2LAB)
+    source = cv2.cvtColor(source, cv2.COLOR_BGR2LAB).astype("float32")
+    target = cv2.cvtColor(target, cv2.COLOR_BGR2LAB).astype('float32')
 
     # compute color statistics for the source and target images
     (lMeanSrc, lStdSrc, aMeanSrc, aStdSrc, bMeanSrc, bStdSrc) = image_stats(source)
     (lMeanTar, lStdTar, aMeanTar, aStdTar, bMeanTar, bStdTar) = image_stats(target)
 
     # subtract the means from the target image
-    (l, a ,b) = cv2.split(image)
+    (l, a ,b) = cv2.split(target)
     l -= lMeanTar
     a -= aMeanTar
     b -= bMeanTar 
 
     # scale by the standard deviations
-    l = (lStdTar / lStdSr) * l
+    l = (lStdTar / lStdSrc) * l
     a = (aStdTar / aStdSrc) * a
     b = (bStdTar / bStdSrc) * b
 
@@ -55,3 +68,29 @@ def image_stats(image):
 
     # return the color statistics
     return (lMean, lStd, aMean, aStd, bMean, bStd)
+
+
+# construct the argument parser and parse arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-s", "--source", required = True, help = "Path to the source image")
+ap.add_argument("-t", "--target", required = True, help = "Path to the target image")
+ap.add_argument("-o", "--output", help = "path to the output image(optional)")
+args = vars(ap.parse_args())
+
+# load the image
+source = cv2.imread(args["source"])
+target = cv2.imread(args["target"])
+
+# transfer the color distribution from the source image
+# to the target image
+transfer = color_transfer(source, target)
+
+# check to see output image is to be saved
+if args["output"] is not None:
+    cv2.imwrite(args["output"], transfer)
+
+# show the images and wait for the keypress
+show_image("Source", source)
+show_image("Target", target)
+show_image("Transfer", transfer)
+cv2.waitKey(0)
