@@ -32,5 +32,3 @@ def plot_color(hist, centroids):
     # return the bar chart
     return bar
 
-# build a histogram of clusters and then create a figure 
-# representing the number of pixels labeled to each color
