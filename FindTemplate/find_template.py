@@ -27,7 +27,7 @@ roi = puzzle[topLeft[1] : botRight[1], topLeft[0] : botRight[0]]
 # construct a darkened transparent 'layer' to darken everything
 # in the puzzle except for waldo
 mask = np.zeros(puzzle.shape, dtype="uint8")
-puzzle = cv2.addWeighted(puzzle, 0.25, waldo, 0.75)
+puzzle = cv2.addWeighted(puzzle, 0.25, waldo, 0.75, 0)
 
 # put the original waldo back in the image so that he is
 # 'brighter' than rest of the image
