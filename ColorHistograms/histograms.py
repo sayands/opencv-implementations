@@ -66,4 +66,42 @@ print ("Flattened feature vector size: %d" % (np.array(features).flatten().shape
 # -------------------------------
 # Computing a 2D color Histogram
 #--------------------------------
+
+# lets move on to 2D histogram -- reducing the 
+# no.of bins from 256 to 32 so we can better
+# visualise the results
+fig = plt.figure()
+
+# plot a 2D color histogram for green and blue
+ax = fig.add_subplot(131)
+hist = cv2.calcHist([chans[1],  chans[0]], [0,1], None, [32, 32], [0, 256, 0, 256])
+p = ax.imshow(hist, interpolation = "nearest")
+ax.set_title("2D color histogram for Green and Blue")
+plt.colorbar(p)
+
+# plot a 2D color histogram for green and red
+ax = fig.add_subplot(132)
+hist = cv2.calcHist([chans[1],  chans[2]], [0,1], None, [32, 32], [0, 256, 0, 256])
+p = ax.imshow(hist, interpolation = "nearest")
+ax.set_title("2D color histogram for Green and Red")
+plt.colorbar(p)
+
+# plot a 2D color histogram for blue and red
+ax = fig.add_subplot(133)
+hist = cv2.calcHist([chans[0],  chans[2]], [0,1], None, [32, 32], [0, 256, 0, 256])
+p = ax.imshow(hist, interpolation = "nearest")
+ax.set_title("2D color histogram for Blue and Red")
+plt.colorbar(p)
+
+# finally lets examine the dimensionality of one of the
+# 2D histogram
+print("2D histogram shape : %s with %d values" %(hist.shape, hist.flatten().shape[0]))
 plt.show()
+
+
+#------------------------------
+# Creating a 3D color histogram
+#------------------------------
+
+hist = cv2.calcHist([image], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+print("3D histogram shape: %s, with %d values" %(hist.shape, hist.flatten().shape[0]))
