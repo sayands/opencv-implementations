@@ -8,7 +8,7 @@ import cv2
 ap = argparse.ArgumentParser()
 ap.add_argument("-e", "--encodings", required = True, help ="Path to serialized db of facial encodings")
 ap.add_argument("-i", "--image", required = True, help = "path to input image")
-ap.add_argument("-d", "--detection-method", type = str, default = "cnn", help ="face detection model to use either hog or cnn")
+ap.add_argument("-d", "--detection-method", type = str, default = "hog", help ="face detection model to use either hog or cnn")
 args = vars(ap.parse_args())
 
 # load the known faces and embedings
