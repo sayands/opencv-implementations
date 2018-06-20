@@ -1,2 +1,4 @@
 FaceRecognition/dataset
 FaceRecognition/videos
+FaceDetection/deploy.prototxt.txt
+FaceDetection/res10_300x300_ssd_iter_140000.caffemodel
