@@ -3,6 +3,7 @@ import cv2
 import numpy as np 
 import imutils
 import cv2
+import argparse
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -16,7 +17,7 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # compute the Scharr gradient magnitude representation of the 
 # images in both the x and y directions
 
-ddepth = cv2.cv.CV_32F if imutils.is_cv2() elsecv2.CV_32F
+ddepth = cv2.cv.CV_32F if imutils.is_cv2() else cv2.CV_32F
 gradX = cv2.Sobel(gray, ddepth = ddepth, dx=1, dy=0, ksize=-1)
 gradY = cv2.Sobel(gray, ddepth = ddepth, dx=0, dy=1, ksize=-1)
 
@@ -30,7 +31,7 @@ blurred = cv2.blur(gradient, (9, 9))
 
 # construct a closign kernel and apply it to threshold image
 kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
-closed = cv2.morphology(thresh, cv2.MORPH_CLOSE, kernel)
+closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
 
 # perform a series of erosions and dilations
 closed = cv2.erode(closed, None, iterations = 4)
