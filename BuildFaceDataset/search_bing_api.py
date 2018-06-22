@@ -4,6 +4,12 @@ import argparse
 import requests
 import cv2
 import os
+import configparser
+
+# importing the API Key using Config Parser
+Config = configparser.ConfigParser()
+Config.read("config.ini")
+API_KEY = Config.get("SectionOne", 'Apikey')
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -16,7 +22,7 @@ args = vars(ap.parse_args())
 # set your Microsoft Cognitive Services API key along with (1) the
 # maximum number of results for a given search and (2) the group size
 # for results (maximum of 50 per request)
-API_KEY = "API KEY here"
+#API_KEY = "API KEY here"
 MAX_RESULTS = 250
 GROUP_SIZE = 50
 
