@@ -8,7 +8,7 @@ import configparser
 
 # importing the API Key using Config Parser
 Config = configparser.ConfigParser()
-Config.read("config.ini")
+Config.read("../config.ini")
 API_KEY = Config.get("SectionOne", 'Apikey')
 
 # construct the argument parser and parse the arguments
