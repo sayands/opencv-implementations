@@ -33,7 +33,7 @@ kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
 skinMask = cv2.erode(threshMap, kernel, iterations = 2)
 skinMask = cv2.dilate(skinMask, kernel, iterations = 2)
 
-# blur mask to remove noise and then applly blur to image
+# blur mask to remove noise and then apply blur to image
 skinMask = cv2.GaussianBlur(skinMask, (3, 3), 0)
 skin = cv2.bitwise_and(image, image, mask = skinMask)
 
@@ -43,9 +43,8 @@ cv2.imshow("Output", saliencyMap)
 cv2.imshow("Thresh", threshMap)
 cv2.waitKey(0)
 
-#show the image, saliencyMap and skin in image
+#show the image, saliencyMap before and after morphological operations
 cv2.imshow("Image", image)
 cv2.imshow("Output", saliencyMap)
-# show the skin in the image along with the mask
 cv2.imshow("Image", np.hstack([image, skin]))
 cv2.waitKey(0)
