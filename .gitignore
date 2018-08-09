@@ -1,10 +1,10 @@
 FaceRecognition/dataset
 FaceRecognition/videos
-FaceDetection/deploy.prototxt.txt
-FaceDetection/res10_300x300_ssd_iter_140000.caffemodel
 FaceDetection/rooster.jpg
 config.ini
 BuildFaceDataset/dataset
 BuildFaceDataset/images
 BuildFaceDataset/urls.txt
 FaceClustering/dataset
+Face-Detection/deploy.prototxt.txt
+Face-Detection/res10_300x300_ssd_iter_140000.caffemodel
