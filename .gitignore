@@ -8,3 +8,5 @@ BuildFaceDataset/urls.txt
 FaceClustering/dataset
 Face-Detection/deploy.prototxt.txt
 Face-Detection/res10_300x300_ssd_iter_140000.caffemodel
+Realtime-Object-Detection/MobileNetSSD_deploy.caffemodel
+Realtime-Object-Detection/MobileNetSSD_deploy.prototxt.txt
