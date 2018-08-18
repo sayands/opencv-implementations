@@ -62,3 +62,72 @@ totalUp = 0
 
 # start the frames per second throughput estimator
 fps = FPS().start()
+
+# loop over frames from the video stream
+while True:
+    # grab the next frame and handle if we are reading from either 
+    # VideoCapture or VideoStream
+    frame = vs.read()
+    frame = frame[1] if args.get("input", False) else frame
+
+    if args["input"] is not None and frame is None:
+        break
+    
+    # resize the frame and convert from BGR to RGB
+    frame = imutils.resize(frame, width = 500)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    if W is None or H is None:
+        (H, w) = frame.shape[:2]
+    
+    # if we are writing to an output file on the disk
+    if args["output"] is not None and writer is None:
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        writer = cv2.VideoWriter(args["output"], fourcc, 30, (W, H), True)
+    
+    # initialise the current status alongwith our list of bounding
+    # box rectangles returned by object detector or correlation
+    # trackers
+    status = "Waiting"
+    rects = []
+
+    # check to see if we should run object detector to aid tracker
+    if totalFrames % args["skip_frames"] == 0:
+        status = "Detecting"
+        trackers = []
+
+        # convert the frame to a blob and pass the blob through the
+        # network and obtain the detections
+        blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
+        net.setInput(blob)
+        detections = net.forward()
+
+
+        # loop over the detections
+        for i in np.arange(0, detections.shape[2]):
+            # extract the confidence associated with each prediction
+            confidence = detections[0, 0, i, 2]
+
+            # filter out weak detections by requiring a minimum confidence
+            if confidence > args["confidence"]:
+                # extract the index of the class label from the detections list
+                idx = int(detections[0, 0, i, 1])
+
+                # if the class label is not a person, ignore it
+                if CLASSES[idx] != "person":
+                    continue
+                
+                # compute the (x, y) coordinates of the bounding box
+                # for the object
+                box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
+                (startX, startY, endX, endY) = box.astype("int")
+
+                # construct a dlib rectangle object from the bounding box
+                # coordinates and then start the dlib correlation tracker
+                tracker = dlib.correlation_tracker()
+                rect = dlib.rectangle(startX, startY, endX, endY)
+                tracker.start_track(rgb, rect)
+
+                # add the tracker to our list of trackers so we can
+                # utilise it during skip frames
+                trackers.append(tracker)
