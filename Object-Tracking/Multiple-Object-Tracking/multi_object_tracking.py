@@ -1,6 +1,3 @@
-# USAGE
-# python multi_object_tracking.py --video videos/soccer_01.mp4 --tracker csrt
-
 # import the necessary packages
 from imutils.video import VideoStream
 import argparse
