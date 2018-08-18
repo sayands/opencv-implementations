@@ -235,3 +235,19 @@ while True:
     # then update the FPS counter
     totalFrames += 1
     fps.update()
+
+# stop the counter and display FPS information
+fps.stop()
+print("[INFO] elapsed time: {: .2f}".format(fps.elapsed()))
+print("[INFO] approx FPS: {: .2f}".format(fps.fps()))
+
+if writer is not None:
+    writer.release()
+
+if not args.get("input", False):
+    vs.stop()
+else
+    vs.release()
+
+# close any open windows
+cv2.destroyAllWindows()
