@@ -11,3 +11,6 @@ Face-Detection/res10_300x300_ssd_iter_140000.caffemodel
 Realtime-Object-Detection/MobileNetSSD_deploy.caffemodel
 Realtime-Object-Detection/MobileNetSSD_deploy.prototxt.txt
 Object-Tracking/Multiple-Object-Tracking/videos
+Object-Tracking/People-Counter/mobilenet_ssd
+Object-Tracking/People-Counter/videos
+Object-Tracking/People-Counter/output

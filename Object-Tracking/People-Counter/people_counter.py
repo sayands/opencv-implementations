@@ -78,7 +78,7 @@ while True:
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     if W is None or H is None:
-        (H, w) = frame.shape[:2]
+        (H, W) = frame.shape[:2]
     
     # if we are writing to an output file on the disk
     if args["output"] is not None and writer is None:
@@ -138,7 +138,7 @@ while True:
         for tracker in trackers:
             # set the status of our system to be 'tracking' rather
             # than 'waiting' or 'detecting'
-            status = "Traacking"
+            status = "Tracking"
 
             # update the tracker and grab the updated position
             tracker.update(rgb)
@@ -246,7 +246,7 @@ if writer is not None:
 
 if not args.get("input", False):
     vs.stop()
-else
+else:
     vs.release()
 
 # close any open windows
