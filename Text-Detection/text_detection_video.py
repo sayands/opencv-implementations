@@ -140,4 +140,28 @@ while True:
 
     # draw the bounding box on the image
     cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+
+    # update the fps counter
+    fps.update()
+
+    # show the output frame
+    cv2.imshow("text Detection", orig)
+    key = cv2.waitKey(1) & 0xFF
+
+    # if the 'q' key was pressed, break from the loop
+    if key == ord('q'):
+        break
     
+# stop the timer
+fps.stop()
+print("[INFO] elapsed time: {.2f}".format(fps.elapsed()))
+print("[INFO] approx FPS: {.2f}".format(fps.fps()))
+
+# if using a webcam
+if not args.get("video", False):
+    vs.stop()
+else:
+    vs.release()
+
+# close all windows
+cv2.destroyAllWindows()
