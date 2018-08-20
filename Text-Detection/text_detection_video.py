@@ -102,3 +102,42 @@ else:
 
 # start the FPS Counter
 fps = FPS().start()
+
+# loop over the Frames in the video stream
+while True:
+    # grab the current frame, then handle 
+    frame = vs.read()
+    frame = frame[1] if args.get("video", False) else frame
+
+    # check to see if we reached end of stream
+    if frame is None:
+        break
+    
+    frame = imutils.resize(frame, width = 1000)
+    orig = frame.copy()
+
+    if W is None or H is None:
+        (H, W) = frame.shape[:2]
+        rW = W / float(newW)
+        rH = H / float(newH)
+    
+    frame = cv2.resize(frame, (newW, newH))
+
+    blob = cv2.dnn.blobFromImage(frame, 1.0, new(W, newH), (123.68, 116.78, 103.94), swapRB = True, crop = False)
+    net.setInput(blob)
+    (scores, geometry) = net.forward(layerNames)
+    
+    # decode predictions and apply NMS
+    (scores, geometry) = net.forward(layerNames)
+
+    # loop over the bounding boxes
+    for (startX, startY, endX, endY) in boxes:
+        # scale the bounding box coordinates based on respective ratios
+        startX = int(startX * rW)
+        startY = int(startY * rH)
+        endX = int(endX * rW)
+        endY = int(endY * rH)
+
+    # draw the bounding box on the image
+    cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+    
