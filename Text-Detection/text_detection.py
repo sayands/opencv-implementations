@@ -59,7 +59,7 @@ rects = []
 confidences = []
 
 # loop over the no.of rows
-for y in numRows:
+for y in range(0,numRows):
     # extract the scores, followed by the geometrical data
     # used to derive potential bounding box coordinates that
     # surround text

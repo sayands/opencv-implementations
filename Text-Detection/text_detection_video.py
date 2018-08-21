@@ -1,5 +1,8 @@
 # import the necessary packages
 from imutils.object_detection import non_max_suppression
+from imutils.video import VideoStream
+from imutils.video import FPS
+import imutils
 import numpy as np 
 import argparse
 import time
@@ -7,11 +10,6 @@ import cv2
 
 
 # function for decoding predictions
-(numRows, numCols) = scores.shape[2:4]
-rects = []
-confidences = []
-
-# loop over the no.of rows
 def decode_predictions(scores, geomery):
     # grab the number of rows and columns from the score volume
     # then initialise our set of bounding box rectangles and
@@ -19,7 +17,7 @@ def decode_predictions(scores, geomery):
     (numRows, numCols) = scores.shape[2:4]
     rects = []
     confidences = []
-    for y in numRows:
+    for y in range(0, numRows):
         # extract the scores, followed by the geometrical data
         # used to derive potential bounding box coordinates that
         # surround text
@@ -123,12 +121,13 @@ while True:
     
     frame = cv2.resize(frame, (newW, newH))
 
-    blob = cv2.dnn.blobFromImage(frame, 1.0, new(W, newH), (123.68, 116.78, 103.94), swapRB = True, crop = False)
+    blob = cv2.dnn.blobFromImage(frame, 1.0, (newW, newH), (123.68, 116.78, 103.94), swapRB = True, crop = False)
     net.setInput(blob)
     (scores, geometry) = net.forward(layerNames)
     
     # decode predictions and apply NMS
-    (scores, geometry) = net.forward(layerNames)
+    (rects, confidences) = decode_predictions(scores, geometry)
+    boxes = non_max_suppression(np.array(rects), probs = confidences)
 
     # loop over the bounding boxes
     for (startX, startY, endX, endY) in boxes:
@@ -138,8 +137,8 @@ while True:
         endX = int(endX * rW)
         endY = int(endY * rH)
 
-    # draw the bounding box on the image
-    cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
+        # draw the bounding box on the image
+        cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
 
     # update the fps counter
     fps.update()
@@ -154,8 +153,8 @@ while True:
     
 # stop the timer
 fps.stop()
-print("[INFO] elapsed time: {.2f}".format(fps.elapsed()))
-print("[INFO] approx FPS: {.2f}".format(fps.fps()))
+print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx FPS: {:.2f}".format(fps.fps()))
 
 # if using a webcam
 if not args.get("video", False):
