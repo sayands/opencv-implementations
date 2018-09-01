@@ -16,3 +16,5 @@ Object-Tracking/People-Counter/videos
 Object-Tracking/People-Counter/output
 Text-Detection/images
 Text-Detection/frozen_east_text_detection.pb
+Neural-Style-Transfer/images
+Neural-Style-Transfer/models
