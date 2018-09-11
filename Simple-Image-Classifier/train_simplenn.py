@@ -92,3 +92,11 @@ plt.xlabel('Epoch #')
 plt.ylabel('Loss/Accuracy')
 plt.legend()
 plt.savefig(args["plot"])
+
+
+# save the model and label binarizer to disk
+print('[INFO] serializing network and label binarizer...')
+model.save(args['model'])
+f = open(args['label_bin'], "wb")
+f.write(pickle.dumps(lb))
+f.close()
