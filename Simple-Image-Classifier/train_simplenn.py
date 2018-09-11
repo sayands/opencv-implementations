@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split 
 from sklearn.metrics import classification_report
-from keras.models import Sequentials
+from keras.models import Sequential
 from keras.layers.core import Dense
 from keras.optimizers import SGD
 from imutils import paths
@@ -56,3 +56,39 @@ labels = np.array(labels)
 lb = LabelBinarizer()
 trainY = lb.fit_transform(trainY)
 testY = lb.transform(testY)
+
+# define the model architecture
+model = Sequential()
+model.add(Dense(1024, input_shape = (3072, ), activation = 'sigmoid'))
+model.add(Dense(512, activation = 'sigmoid'))
+model.add(Dense(len(lb.classes_), activation = 'softmax'))
+
+# initialize our learning rate and # of epochs to train for
+INIT_LR = 0.01
+EPOCHS = 75
+
+print("[INFO] training network...")
+opt = SGD(lr = INIT_LR)
+model.compile(loss = 'categorical_crossentropy', optimizer = opt, metrics = ['accuracy'])
+
+# train the network
+H = model.fit(trainX, trainY, validation_data = (testX, testY), epochs = EPOCHS, batch_size = 32)
+
+# evaluate the network
+print('[INFO] evaluating network...')
+predictions = model.predict(testX, batch_size = 32)
+print(classification_report(testY.argmax(axis = 1), predictions.argmax(axis = 1), target_names = lb.classes_))
+
+# plot training loss and accuracy
+N = np.arange(0, EPOCHS)
+plt.style('ggplot')
+plt.figure()
+plt.plot(N, H.history["loss"], label = 'train_loss')
+plt.plot(N, H.history['val_loss'], label = 'val_loss')
+plt.plot(N, H.history['acc'], label = 'train_acc')
+plt.plot(N, H.history['val_acc'], label = 'val_acc')
+plt.title('Training loss and Accuracy(Simple NN)')
+plt.xlabel('Epoch #')
+plt.ylabel('Loss/Accuracy')
+plt.legend()
+plt.savefig(args["plot"])
