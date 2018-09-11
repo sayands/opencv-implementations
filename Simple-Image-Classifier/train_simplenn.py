@@ -81,7 +81,7 @@ print(classification_report(testY.argmax(axis = 1), predictions.argmax(axis = 1)
 
 # plot training loss and accuracy
 N = np.arange(0, EPOCHS)
-plt.style('ggplot')
+plt.style.use('ggplot')
 plt.figure()
 plt.plot(N, H.history["loss"], label = 'train_loss')
 plt.plot(N, H.history['val_loss'], label = 'val_loss')
