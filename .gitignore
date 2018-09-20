@@ -24,3 +24,5 @@ Semantic-Segmentation/enet-cityscapes
 Simple-Image-Classifier/animals
 Simple-Image-Classifier/images
 Simple-Image-Classifier/output
+Text-Recognition/images
+Text-Recognition/frozen_east_text_detection.pb
