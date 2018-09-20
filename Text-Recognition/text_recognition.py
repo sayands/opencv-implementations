@@ -62,4 +62,50 @@ def decode_predictions(scores, geometry):
     return (rects, confidences)
 
 # construct the argument parser and parse the arguments
-        
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--image", type = str, help = "Path to input image")
+ap.add_argument("-east", "--east", type = str, help = "Path to input EASY text detector")
+ap.add_argument("-c", "--min-confidence", type = float, default = 0.5, help = "minimum probability required to inspect a region")
+ap.add_argument("-w", "--width", type = int, default = 320, help = "nearest multiple of 32 for resized width")
+ap.add_argument("-e", "--height", type = int, default = 320, help = "nearest multiple of 32 for resized height")
+ap.add_argument("-p", "--padding", type = float, default = 0.0, help = "amount of padding to add each border of ROI")
+args = vars(ap.parse_args())
+
+# load the input image and grab the image dimensions
+image = cv2.imread(args["image"])
+orig = image.copy()
+(origH, origW) = image.shape[:2]
+
+# set the new width and height and then determine the ratio in change
+# for both the width and height
+(newW, newH) = (args["width"], args["height"])
+rW = origW / float(newW)
+rH = origH / float(newH)
+
+# resize the image and grab the new image dimensions
+image = cv2.resize(image, (newW, newH))
+(H, W) = image.shape[:2]
+
+# define the output two layer names for the EAST detector model 
+layerNames = [
+    "feature_fusion/Conv_7/Sigmoid",
+    "feature_fusion/concat_3"
+]
+
+# load the pre-trained EAST text detector
+print("[INFO] loading EAST text detector...")
+net = cv2.dnn.readNet(args["east"])
+
+# construct the blob from the image and then forward pass of the
+# model to obtain the two output layer sets
+blob = cv2.dnn.blobFromImage(image, 1.0, (W, H), (123.68, 116.78, 103.94), swapRB = True, crop = False)
+net.setInput(blob)
+(scores, geometry) = net.forward(layerNames)
+
+# decode the predictions, then apply NMS to suppress weak,
+# overlapping bounding boxes
+(rects, confidences) = decode_predictions(scores, geometry)
+boxes = non_max_suppression(np.array(rects), probs = confidences)
+
+# initialise the list of results
+results = []
