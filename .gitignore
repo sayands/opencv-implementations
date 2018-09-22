@@ -26,3 +26,4 @@ Simple-Image-Classifier/images
 Simple-Image-Classifier/output
 Text-Recognition/images
 Text-Recognition/frozen_east_text_detection.pb
+Text-Skew-Correction/images
