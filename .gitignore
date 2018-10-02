@@ -28,3 +28,7 @@ Text-Recognition/images
 Text-Recognition/frozen_east_text_detection.pb
 Text-Skew-Correction/images
 Facial-Landmark-Detection/5-Point-Detector/shape_predictor_5_face_landmarks.dat
+Realtime-Object-Detection/Mask_RCNN/cars.jpg
+Realtime-Object-Detection/Mask_RCNN/cars.mp4
+Realtime-Object-Detection/Mask_RCNN/model/frozen_inference_graph.pb
+Realtime-Object-Detection/Mask_RCNN/model/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt
