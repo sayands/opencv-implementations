@@ -27,3 +27,4 @@ Simple-Image-Classifier/output
 Text-Recognition/images
 Text-Recognition/frozen_east_text_detection.pb
 Text-Skew-Correction/images
+Facial-Landmark-Detection/5-Point-Detector/shape_predictor_5_face_landmarks.dat
