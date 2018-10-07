@@ -12,7 +12,7 @@ def createDataMatrix(images):
     numImages = len(images)
     sz = images[0].shape
     data = np.zeros((numImages, sz[0] * sz[1] * sz[2]), dtype = np.float32)
-    for i in xrange(0, numImages):
+    for i in range(0, numImages):
         image = images[i].flatten()
         data[i,:] = image
     
@@ -24,8 +24,8 @@ def createNewFace(*args):
     output = averageFace
 
     # Add the eigenface with the weights
-    for i in xrange(0, NUM_EIGEN_FACES):
-        sliderValues[i] = cv2.getTrackbarPos("weight" + str(i), "Trackbars")
+    for i in range(0, NUM_EIGEN_FACES):
+        sliderValues[i] = cv2.getTrackbarPos("Weight" + str(i), "Trackbars");
         weight = sliderValues[i] - MAX_SLIDER_VALUE /2
         output = np.add(output, eigenFaces[i] * weight)
     
@@ -33,12 +33,50 @@ def createNewFace(*args):
     output = cv2.resize(output, (0,0), fx = 2, fy = 2)
     cv2.imshow("Result", output)
 
+
 # Read images from the directory
-def readImage():
+def readImages(path):
+    print("Reading images from " + path, end = "...")
 
+    # Create an array of array of images
+    images = []
 
+    # List all files in the directory and read points from text files one by one
+    for filePath in sorted(os.listdir(path)):
+        fileExt = os.path.splitext(filePath)[1]
+        if fileExt in [".jpg", ".jpeg"]:
 
+            # Add to the array of images
+            imagePath = os.path.join(path, filePath)
+            im = cv2.imread(imagePath)
 
+            if im is None:
+                print("image:{} not read properly".format(imagePath))
+
+            else:
+                # Convert to image to floating Point
+                im = np.float32(im)/255.0
+                # Add image to list
+                images.append(im)
+                # Flip Image
+                imFlip = cv2.flip(im, 1)
+                # Append flipped image
+                images.append(imFlip)
+
+    numImages = len(images) / 2
+    # Exit if no images found
+    if numImages == 0:
+        print("No Images Found")
+        sys.exit(0)
+    
+    print(str(numImages) + " files read.")
+    return images
+
+# Resetting slider values
+def resetSliderValues(*args):
+    for i in range(0, NUM_EIGEN_FACES):
+        cv2.setTrackbarPos("Weight" + str(i), "Trackbars", MAX_SLIDER_VALUE//2);
+    createNewFace()
 
 if __name__ == '__main__':
 
@@ -66,7 +104,7 @@ if __name__ == '__main__':
 
     averageFace = mean.reshape(sz)
 
-    eigenFaces = []
+    eigenFaces = [];
 
     for eigenVector in eigenvectors:
         eigenFace =eigenVector.reshape(sz)
@@ -77,7 +115,7 @@ if __name__ == '__main__':
 
     # Display result at 2x size
     output = cv2.resize(averageFace, (0, 0), fx = 2, fy = 2)
-    cv2.imshow(output)
+    cv2.imshow("Result", output)
 
     # Create Window for trackbars
     cv2.namedWindow("Trackbars", cv2.WINDOW_AUTOSIZE)
@@ -85,9 +123,9 @@ if __name__ == '__main__':
     sliderValues = []
 
     # Create Trackbars
-    for i in xrange(0, NUM_EIGEN_FACES):
+    for i in range(0, NUM_EIGEN_FACES):
         sliderValues.append(MAX_SLIDER_VALUE/2)
-        cv2.createTrackbar("weight" + str(i), "Trackbars", MAX_SLIDER_VALUE/2, MAX_SLIDER_VALUE, createNewFace)
+        cv2.createTrackbar("Weight" + str(i), "Trackbars", MAX_SLIDER_VALUE//2, MAX_SLIDER_VALUE, createNewFace)
 
     # Reset sliders by clicking on mean image
     cv2.setMouseCallback("Result", resetSliderValues)
