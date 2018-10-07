@@ -4,6 +4,35 @@ import sys
 import cv2
 import numpy as np 
 
+
+# Creating the data matrix
+def createDataMatrix(images):
+    print('Creating data matrix', end = '...')
+
+    numImages = len(images)
+    sz = images[0].shape
+    data = np.zeros((numImages, sz[0] * sz[1] * sz[2]), dtype = np.float32)
+    for i in xrange(0, numImages):
+        image = images[i].flatten()
+        data[i,:] = image
+    
+    print("DONE")
+    return data
+
+# Creating new Face
+def createNewFace(*args):
+    output = averageFace
+
+    # Add the eigenface with the weights
+    for i in xrange(0, NUM_EIGEN_FACES):
+        sliderValues[i] = cv2.getTrackbarPos("weight" + str(i), "Trackbars")
+        weight = sliderValues[i] - MAX_SLIDER_VALUE /2
+        output = np.add(output, eigenFaces[i] * weight)
+    
+    # Display Result at 2x size
+    output = cv2.resize(output, (0,0), fx = 2, fy = 2)
+    cv2.imshow("Result", output)
+
 # Read images from the directory
 def readImage():
 
