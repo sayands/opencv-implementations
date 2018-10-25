@@ -46,7 +46,7 @@ while True:
 
     # if writing output video to disk
     if args['output'] is not None and writer is None:
-        fourcc = cv2.VideoWriter_fourcc("MJPG")
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
         writer = cv2.VideoWriter(args['output'], fourcc, 30, (frame.shape[1], frame.shape[0]), True)
     
     if tracker is None:
@@ -89,4 +89,27 @@ while True:
         # draw the bounding box from the correlation object tracker
         cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
         cv2.putText(frame, label, (startX, startY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
-        
+    
+    if writer is not None:
+        writer.write(frame)
+    
+    # show the output frame
+    cv2.imshow("Frame", frame)
+    key = cv2.waitKey(1) & 0xFF
+
+    if key == ord('q'):
+        break
+    
+    fps.update()
+
+# Stop the FPS timer
+fps.stop()
+print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
+print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
+
+# Check to see if we need to release the video writer pointer
+if writer is not None:
+    writer.release()
+
+cv2.destroyAllWindows()
+vs.release()
