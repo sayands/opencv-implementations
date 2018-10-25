@@ -49,3 +49,44 @@ while True:
         fourcc = cv2.VideoWriter_fourcc("MJPG")
         writer = cv2.VideoWriter(args['output'], fourcc, 30, (frame.shape[1], frame.shape[0]), True)
     
+    if tracker is None:
+        (h, w) = frame.shape[:2]
+        blob = cv2.dnn.blobFromImage(frame, 0.007843, (w, h), 127.5)
+
+        net.setInput(blob)
+        detections = net.forward()
+
+        # ensure atleast one detection is made
+        if len(detections) > 0:
+            i = np.argmax(detections[0, 0, :, 2])
+
+            conf = detections[0, 0, i, 2]
+            label = CLASSES[int(detections[0, 0, i, 1])]
+
+            if conf > args['confidence'] and label == args['label']:
+                # Compute the (x, y)-coordinates of the bounding box
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+
+                tracker = dlib.correlation_tracker()
+                rect = dlib.rectangle(startX, startY, endX, endY)
+                tracker.start_track(rgb, rect)
+
+                # draw the bounding box and text for the object
+                cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                cv2.putText(frame, label, (startX, startY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+    
+    else:
+        tracker.update(rgb)
+        pos = tracker.get_position()
+
+        # unpack the position object
+        startX = int(pos.left())
+        startY = int(pos.top())
+        endX = int(pos.right())
+        endY = int(pos.bottom())
+
+        # draw the bounding box from the correlation object tracker
+        cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+        cv2.putText(frame, label, (startX, startY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+        
