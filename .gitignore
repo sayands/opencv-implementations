@@ -33,6 +33,8 @@ Realtime-Object-Detection/Mask_RCNN/cars.mp4
 Realtime-Object-Detection/Mask_RCNN/model/frozen_inference_graph.pb
 Realtime-Object-Detection/Mask_RCNN/model/mask_rcnn_inception_v2_coco_2018_01_28.pbtxt
 EigenFace-PCA/images
-Object-Tracking/Dlib-Object-Tracking/mobilenet_ssd
-Object-Tracking/Dlib-Object-Tracking/input
-Object-Tracking/Dlib-Object-Tracking/output
+Object-Tracking/Dlib-Object-Tracking/Single-Object/mobilenet_ssd
+Object-Tracking/Dlib-Object-Tracking/Single-Object/input
+Object-Tracking/Dlib-Object-Tracking/Single-Object/output
+Object-Tracking/Dlib-Object-Tracking/Multi-Object/race.mp4
+Object-Tracking/Dlib-Object-Tracking/Multi-Object/mobilenet_ssd
