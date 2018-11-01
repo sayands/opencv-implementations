@@ -43,7 +43,7 @@ ap.add_argument("-c", "--confidence", type = float, default = 0.2, help = "minim
 args = vars(ap.parse_args())
 
 # initialize the list of queues - both input queue and output queue
-inputQueue = []
+inputQueues = []
 outputQueues = []
 
 # initialise the list of class labels MobileNet SSD was trained to detect
@@ -93,3 +93,39 @@ while True:
 
                 if CLASSES[idx]!= 'person':
                     continue
+                
+                # compute the (x, y)-coordinates of the bounding box for the object
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+                bb = (startX, startY, endX, endY)
+
+                # create two brand input and output queues respectively
+                iq = multiprocessing.Queue()
+                oq = multiprocessing.Queue()
+                inputQueues.append(iq)
+                outputQueues.append(oq)
+
+                # spawn a daemon process for new object tracker
+                p = multiprocessing.Process(
+                    target = start_tracker,
+                    args = (bb, label, rgb, iq, oq))
+                p.daemon = True
+                p.start()
+
+                # grab the corresponding class label for the detection and draw
+                # the bounding box
+                cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+                cv2.putText(frame, label, (startX, startY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+
+    else:
+        for iq in inputQueues:
+            iq.put(rgb)
+        
+        for oq in outputQueues:
+            (label, (startX, startY, endX, endY)) = oq.get()
+
+            # draw the bounding box from the correlation object tracker
+            cv2.rectangle(frame, (startX, startY), (endX, endY), (0, 255, 0), 2)
+            cv2.putText(frame, label, (startX, startY - 15), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 2)
+
+    
