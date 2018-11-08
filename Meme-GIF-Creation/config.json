@@ -4,7 +4,7 @@
   "landmark_predictor": "assets/shape_predictor_68_face_landmarks.dat",
   "sunglasses": "assets/sunglasses.png",
   "sunglasses_mask": "assets/sunglasses_mask.png",
-  "deal_with_it": "assests/deal_with_it.png",
+  "deal_with_it": "assets/deal_with_it.png",
   "deal_with_it_mask": "assets/deal_with_it_mask.png",
   "min_confidence": 0.5,
   "steps": 20,

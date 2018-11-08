@@ -58,7 +58,7 @@ def create_gif(inputPath, outputPath, delay, finalDelay, loop):
 ap = argparse.ArgumentParser()
 ap.add_argument("-c", "--config", required = True, help = "Path to configuration file")
 ap.add_argument("-i", "--image", required = True, help = "Path to input image")
-ap.add_argument("-o", "-output", required = True, help = "Path to output GIF")
+ap.add_argument("-o", "--output", required = True, help = "Path to output GIF")
 args = vars(ap.parse_args())
 
 # load the JSON configuration file
@@ -109,3 +109,62 @@ leftEyePts = shape[lStart:lEnd]
 rightEyePts = shape[rStart:rEnd]
 
 # compute the center of mass for each eye
+leftEyeCenter = leftEyePts.mean(axis = 0).astype("int")
+rightEyeCenter = rightEyePts.mean(axis = 0).astype("int")
+
+# compute the angle between the eye centroids
+dY = rightEyeCenter[1] - leftEyeCenter[1]
+dX = rightEyeCenter[0] - leftEyeCenter[0]
+angle = np.degrees(np.arctan2(dY, dX)) - 180
+
+sg = imutils.rotate_bound(sg, angle)
+
+
+sgW = int((endX - startX) * 0.9)
+sg = imutils.resize(sg, width = sgW)
+
+# Binarize mask
+sgMask = cv2.cvtColor(sgMask, cv2.COLOR_BGR2GRAY)
+sgMask = cv2.threshold(sgMask, 0, 255, cv2.THRESH_BINARY)[1]
+sgMask = imutils.rotate_bound(sgMask, angle)
+sgMask = imutils.resize(sgMask, width = sgW, inter = cv2.INTER_NEAREST)
+
+steps = np.linspace(0, rightEyeCenter[1], config["steps"], dtype = "int")
+
+# start looping over the steps
+for (i, y) in enumerate(steps):
+    shiftX = int(sg.shape[1] * 0.25)
+    shiftY = int(sg.shape[0] * 0.35)
+    y = max(0, y - shiftY)
+
+    # add the sunglasses to the image
+    output = overlay_image(image, sg, sgMask, (rightEyeCenter[0] - shiftX, y))
+
+    # add text for final frame
+    if i == len(steps) - 1:
+        dwi = cv2.imread(config["deal_with_it"])
+        dwiMask = cv2.imread(config["deal_with_it_mask"])
+        dwiMask = cv2.cvtColor(dwiMask, cv2.COLOR_BGR2GRAY)
+        dwiMask = cv2.threshold(dwiMask, 0, 255, cv2.THRESH_BINARY)[1]
+
+        # resize both the text image and mask
+        oW = int(W * 0.8)
+        dwi = imutils.resize(dwi, width = oW)
+        dwiMask = imutils.resize(dwiMask, width = oW, inter = cv2.INTER_NEAREST)
+
+        # compute the coordinates of where the text will go on output image
+        # and add text to image
+        oX = int(W * 0.1)
+        oY = int(H * 0.8)
+        output = overlay_image(output, dwi, dwiMask, (oX, oY))
+
+    p = os.path.sep.join([config["temp_dir"], "{}.jpg".format(str(i).zfill(8))])
+    cv2.imwrite(p, output)
+
+# create the output GIF image
+print("[INFO] creating GIF...")
+create_gif(config["temp_dir"], args["output"], config["delay"], config["final_delay"], config["loop"])
+
+# cleanup
+print("[INFO] Cleaning Up...")
+shutil.rmtree(config["temp_dir"], ignore_errors = True)
