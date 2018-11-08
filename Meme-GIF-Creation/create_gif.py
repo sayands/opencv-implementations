@@ -53,5 +53,59 @@ def create_gif(inputPath, outputPath, delay, finalDelay, loop):
 
     cmd = "convert -delay {} {} -delay {} {} -loop {} {}".format(delay, " ".join(imagePaths), finalDelay, lastPath, loop, outputPath)
     os.system(cmd)
-    
 
+# Construct the argument parser
+ap = argparse.ArgumentParser()
+ap.add_argument("-c", "--config", required = True, help = "Path to configuration file")
+ap.add_argument("-i", "--image", required = True, help = "Path to input image")
+ap.add_argument("-o", "-output", required = True, help = "Path to output GIF")
+args = vars(ap.parse_args())
+
+# load the JSON configuration file
+config = json.loads(open(args["config"]).read())
+sg = cv2.imread(config["sunglasses"])
+sgMask = cv2.imread(config["sunglasses_mask"])
+
+shutil.rmtree(config["temp_dir"], ignore_errors = True)
+os.makedirs(config["temp_dir"])
+
+# load OpenCV face detector and dlib facial landmark predictor
+print("[INFO] loading models...")
+detector = cv2.dnn.readNetFromCaffe(config["face_detector_prototxt"], config["face_detector_weights"])
+predictor = dlib.shape_predictor(config["landmark_predictor"])
+
+# load the input image and construct an input blob from the image 
+image = cv2.imread(args["image"])
+(H, W) = image.shape[:2]
+blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
+
+# pass the blob through the network and obtain the detections
+print("[INFO] computing object detection...")
+detector.setInput(blob)
+detections = detector.forward()
+
+i = np.argmax(detections[0, 0, :, 2])
+confidence = detections[0, 0, i, 2]
+
+# filter out weak detections
+if confidence < config["min_confidence"]:
+    print("[INFO] no reliable faces found")
+    sys.exit(0)
+
+# compute the (x, y)-coordinates of the bounding box for the face
+box = detections[0, 0, i, 3:7] * np.array([W, H, W, H])
+(startX, startY, endX, endY) = box.astype("int")
+
+# construct a dlib rectangle object from bounding box coordinates and 
+# determine the facial coordinates
+rect = dlib.rectangle(int(startX), int(startY), int(endX), int(endY))
+shape = predictor(image, rect)
+shape = face_utils.shape_to_np(shape)
+
+# grab the indexes of the facial landmarks for the left and right eye 
+(lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+(rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+leftEyePts = shape[lStart:lEnd]
+rightEyePts = shape[rStart:rEnd]
+
+# compute the center of mass for each eye
